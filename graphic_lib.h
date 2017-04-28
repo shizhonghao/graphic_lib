@@ -6,6 +6,8 @@
 
 using namespace std;
 
+const int INF = 0x3f3f3f3f;
+
 void draw_line(HDC hdc,int x0,int y0,int x1,int y1,COLORREF color)
 {
     int i;
@@ -286,28 +288,159 @@ void draw_eclipse(HDC hdc,int x0,int y0,int a,int b,double ang1,double ang2, COL
     ecli.clear();
 }
 
-class Polygon
+struct EDGE
+{
+    double x1;
+    double dx;
+    int ymax;
+    bool operator < (const EDGE &e) const
+    {
+        return x1<e.x1;
+    }
+};
+
+class polygon
 {
 private:
     vector<point> p;
-    vector<
+    vector<int> AET[1080];
+    vector<EDGE> NET[1080];
+    int ymax,ymin;
+    int M,N;
+    int pattern[1080][1920];
 public:
-    void build()
+    polygon()
     {
+        //cout << "new polygon" << endl;
+    }
+    void add_point(int x,int y)
+    {
+        point pnt;
+        pnt.x = x;
+        pnt.y = y;
+        p.push_back(pnt);
+    }
+    void build(HDC hdc,COLORREF color)
+    {
+        EDGE e;
+        int i,j;
+        ymax = ymin = p[p.size()-1].y;
+        for(i=0;i<p.size()-1;i++)
+        {
+            draw_line(hdc,p[i].x,p[i].y,p[i+1].x,p[i+1].y,color);
+            ymax = max(ymax,p[i].y);
+            ymin = min(ymin,p[i].y);
 
+            if(p[i].y>p[i+1].y)
+            {
+                e.x1 = p[i+1].x;
+                e.ymax = p[i].y;
+                e.dx = 1.0*(p[i].x - p[i+1].x)/(p[i].y - p[i+1].y);
+                NET[p[i+1].y].push_back(e);
+            }
+            else if(p[i].y<p[i+1].y)
+            {
+                e.x1 = p[i].x;
+                e.ymax = p[i+1].y;
+                e.dx = 1.0*(p[i].x - p[i+1].x)/(p[i].y - p[i+1].y);
+                NET[p[i].y].push_back(e);
+            }
+        }
+        draw_line(hdc,p[0].x,p[0].y,p[i].x,p[i].y,color);
+        if(p[i].y>p[0].y)
+        {
+            e.x1 = p[0].x;
+            e.ymax = p[i].y;
+            e.dx = 1.0*(p[i].x - p[0].x)/(p[i].y - p[0].y);
+            NET[p[0].y].push_back(e);
+        }
+        else if(p[i].y<p[i+1].y)
+        {
+            e.x1 = p[i].x;
+            e.ymax = p[0].y;
+            e.dx = 1.0*(p[i].x - p[0].x)/(p[i].y - p[0].y);
+            NET[p[i].y].push_back(e);
+        }
+
+        for(i=0;i<1080;i++)
+        {
+            for(j=0;j<NET[i].size();j++)
+            {
+                cout << NET[i].size() << "x: " << NET[i][j].x1 << "ymax: " << NET[i][j].ymax << "dx: " << NET[i][j].dx << endl;
+            }
+        }
+
+        vector<EDGE> temp;
+        for(i=ymin;i<ymax;i++)
+        {
+            cout << i << " ";
+            for(j=0;j<NET[i].size();j++)
+            {
+                temp.push_back(NET[i][j]);
+            }
+            for(j=0;j<temp.size();j++)
+            {
+                if(temp[j].ymax==i)
+                {
+                    temp.erase(temp.begin()+j);
+                    j--;
+                }
+            }
+            for(j=0;j<temp.size();j++)
+            {
+                temp[j].x1 += temp[j].dx;
+                AET[i+1].push_back(temp[j].x1);
+            }
+            sort(AET[i].begin(),AET[i].end());
+        }
     }
     void clear()
     {
         p.clear();
     }
-    void fill_color(HDC hdc,COLORREF color,Polygon p)
+    void fill_color(HDC hdc,COLORREF color)
     {
-
+        int i,j,k;
+        for(i=ymin;i<=ymax;i++)
+        {
+            for(j=0;j<AET[i].size();j+=2)
+            {
+                for(k=AET[i][j]+1;k<AET[i][j+1];k++)
+                {
+                    SetPixel(hdc,k,i,color);
+                }
+            }
+        }
     }
-
-    void fill_shade(HDC hdc,COLORREF color,Polygon p)
+    void set_pattern(int m,int n,int *pat)
     {
-
+        int i,j;
+        M = m;
+        N = n;
+        for(i=0;i<n;i++)
+        {
+            for(j=0;j<m;j++)
+            {
+                pattern[i][j] = *(pat+i*m+n);
+            }
+        }
+    }
+    void fill_shade(HDC hdc,COLORREF color)
+    {
+        int i,j,k;
+        for(i=ymin;i<=ymax;i++)
+        {
+            for(j=0;j<AET[i].size();j+=2)
+            {
+                for(k=AET[i][j]+1;k<AET[i][j+1];k++)
+                {
+                    if(pattern[k%M][i%N])
+                    {
+                        SetPixel(hdc,k,i,color);
+                    }
+                }
+            }
+        }
     }
 };
 

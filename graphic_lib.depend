@@ -1,10 +1,10 @@
 # depslib dependency file v1.0
-1492099638 source:c:\users\施中昊\desktop\2017 coding\计算机图形学大作业\图形函数库\graphic_lib\main.cpp
+1493383124 source:c:\users\施中昊\desktop\2017 coding\计算机图形学大作业\图形函数库\graphic_lib\main.cpp
 	<iostream>
 	<windows.h>
 	"graphic_lib.h"
 
-1492099664 c:\users\施中昊\desktop\2017 coding\计算机图形学大作业\图形函数库\graphic_lib\graphic_lib.h
+1493383190 c:\users\施中昊\desktop\2017 coding\计算机图形学大作业\图形函数库\graphic_lib\graphic_lib.h
 	<windows.h>
 	<iostream>
 	<algorithm>

@@ -10,7 +10,7 @@ const COLORREF BLUE = RGB(0,0,255);
 
 using namespace std;
 
-
+int pat[10][10];
 int main()
 {
     HWND hwnd = GetForegroundWindow();
@@ -32,8 +32,20 @@ int main()
 
     draw_eclipse(hdc,700,200,100,50,30,180,BLUE);
     //cout << sin(30/180.0*M_PI);
-    Polygon poly;
 
+    polygon *poly = new polygon;
+    poly->add_point(200,200);
+    poly->add_point(300,300);
+    poly->add_point(200,300);
+    poly->build(hdc,GREEN);
+
+
+    for(int i=0;i<10;i++)
+    {
+        pat[5][i] = 1;
+    }
+    poly->set_pattern(10,10,(int*)pat);
+    poly->fill_shade(hdc,BLUE);
     //UpdateWindow(hwnd);
     return 0;
 }
