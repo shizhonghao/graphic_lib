@@ -171,7 +171,7 @@ void draw_arc(HDC hdc,int x0,int y0,int r,double ang1,double ang2,COLORREF color
         x++;
         add_points(x0,y0,x,y);
     }
-    cout << circ.size();
+    //cout << circ.size();
     sort(circ.begin(),circ.end());
     for(int i=0;i<circ.size();i++)
     {
@@ -361,7 +361,7 @@ public:
             e.dx = 1.0*(p[i].x - p[0].x)/(p[i].y - p[0].y);
             NET[p[i].y].push_back(e);
         }
-
+/*
         for(i=0;i<1080;i++)
         {
             for(j=0;j<NET[i].size();j++)
@@ -369,11 +369,11 @@ public:
                 cout << NET[i].size() << "x: " << NET[i][j].x1 << "ymax: " << NET[i][j].ymax << "dx: " << NET[i][j].dx << endl;
             }
         }
-
+*/
         vector<EDGE> temp;
         for(i=ymin;i<ymax;i++)
         {
-            cout << i << " ";
+            //cout << i << " ";
             for(j=0;j<NET[i].size();j++)
             {
                 temp.push_back(NET[i][j]);
@@ -401,7 +401,7 @@ public:
     void fill_color(HDC hdc,COLORREF color)
     {
         int i,j,k;
-        for(i=ymin;i<=ymax;i++)
+        for(i=ymin+1;i<ymax;i++)
         {
             for(j=0;j<AET[i].size();j+=2)
             {
@@ -428,7 +428,7 @@ public:
     void fill_shade(HDC hdc,COLORREF color)
     {
         int i,j,k;
-        for(i=ymin;i<=ymax;i++)
+        for(i=ymin+1;i<ymax;i++)
         {
             for(j=0;j<AET[i].size();j+=2)
             {
